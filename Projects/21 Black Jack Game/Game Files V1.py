@@ -44,7 +44,7 @@ while True:
             for suit in suits:
                 card = rank + suit
                 deck_of_cards.append(card)
-            print('Deck has been reset and reshuffled!')
+    print('Deck has been reset and reshuffled!')
 
 
     ### Shuffle the deck
