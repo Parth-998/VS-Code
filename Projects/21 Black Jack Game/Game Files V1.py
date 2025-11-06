@@ -35,8 +35,18 @@ def calculate_hand_value(hand):
         print('Ace is now a 1!')
     return total
 
-
+### while True here is for the replayability
 while True:
+    ### when to reshuffle deck
+    if len(deck_of_cards) < 12:
+        deck_of_cards = []
+        for rank in card_numbers:
+            for suit in suits:
+                card = rank + suit
+                deck_of_cards.append(card)
+            print('Deck has been reset and reshuffled!')
+
+
     ### Shuffle the deck
     random.shuffle(deck_of_cards)
 
