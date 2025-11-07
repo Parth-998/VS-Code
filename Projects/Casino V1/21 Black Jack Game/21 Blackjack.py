@@ -5,6 +5,16 @@ win_counter = 0
 loss_counter = 0
 
 
+### Betting System v1
+def chips():
+    White = 1
+    Red = 5
+    Green = 25
+    Black = 100
+    Purple = 500
+
+
+
 ### Creating the deck of cards
 deck_of_cards = []
 suits = ['H', 'D', 'C', 'S']
@@ -38,13 +48,13 @@ def calculate_hand_value(hand):
 ### while True here is for the replayability
 while True:
     ### when to reshuffle deck
-    if len(deck_of_cards) < 12:
+    if len(deck_of_cards) < 6:
         deck_of_cards = []
         for rank in card_numbers:
             for suit in suits:
                 card = rank + suit
                 deck_of_cards.append(card)
-    print('Deck has been reset and reshuffled!')
+        print('Deck has been reset and reshuffled!')
 
 
     ### Shuffle the deck
@@ -82,12 +92,12 @@ while True:
     # print(len(deck_of_cards))
 
     ### Autowin off of draw condition
-    if player_total == 21:
-        win_counter += 1
-        print('You Win!' + ', ' + 'Wins: ' + str(win_counter))
-    if dealer_total == 21:
-        loss_counter += 1
-        print('You Lose :(' + ', ' + 'Losses: ' + str(loss_counter))
+    # if player_total == 21:
+    #     win_counter += 1
+    #     print('You Win!' + ', ' + 'Wins: ' + str(win_counter))
+    # if dealer_total == 21:
+    #     loss_counter += 1
+    #     print('You Lose :(' + ', ' + 'Losses: ' + str(loss_counter))
 
     ### Player Hit, Stand Choices
     while player_total < 21:
@@ -136,4 +146,5 @@ while True:
 
     play_again = input('Do you want to play another hand? ')
     if play_again.lower() != 'yes':
+        print('Thanks for playing!')
         break
