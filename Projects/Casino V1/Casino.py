@@ -6,7 +6,9 @@ balance = 0
 new_or_returning_player = input('Are you a New or Returning player? ')
 
 if new_or_returning_player.lower() == 'new':
-    print('Welcome In!')
+    player_name = input('What is your name? ')
+    print(f'Welcome In {player_name}!')
+    # Store the player name in a file
     balance = int(input('How much would you like to Deposit today? '))
     while True:
         depo_input = input(f'You have deposited ${balance}. Would you like to deposit more? (Y/N) ')
@@ -14,6 +16,7 @@ if new_or_returning_player.lower() == 'new':
             balance_addon = int(input('How much more would you like to deposit? '))
             balance += balance_addon
             print(f'You now have ${balance}.')
+            # Store this next to the player name with the final amount
         if depo_input.lower() == 'n':
             break
 elif new_or_returning_player.lower() == 'returning':
@@ -28,6 +31,7 @@ elif new_or_returning_player.lower() == 'returning':
             balance_addon = int(input('How much more would you like to deposit? '))
             balance += balance_addon
             print(f'You now have ${balance}.')
+            # Store this next to the player name with the final amount
         if depo_input.lower() == 'n':
             break
     # Need to add more but unsure as to what to add to keep player data from previous sessions.
