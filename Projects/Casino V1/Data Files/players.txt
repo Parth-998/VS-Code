@@ -1,2 +1,4 @@
-Jean Paul,696969
-Max Verstappen,1000000
+Jean Paul,696969,0
+Max Verstappen,2397953,496936
+peter park,1,0
+test01,9876544,123456
