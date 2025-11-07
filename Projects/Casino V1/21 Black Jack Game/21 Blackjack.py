@@ -1,9 +1,10 @@
 import random
 
+### Pre-Game Systems?
+
 ### counters
 win_counter = 0
 loss_counter = 0
-
 
 ### Betting System v1
 def chips():
@@ -14,6 +15,7 @@ def chips():
     Purple = 500
 
 
+### Main Game Logic
 
 ### Creating the deck of cards
 deck_of_cards = []
@@ -24,7 +26,6 @@ for rank in card_numbers:
     for suit in suits:
         card = rank + suit
         deck_of_cards.append(card)
-
 
 ### Hand Value Calculator
 def calculate_hand_value(hand):
