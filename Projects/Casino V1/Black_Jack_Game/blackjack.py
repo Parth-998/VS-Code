@@ -4,25 +4,25 @@ import time
 
 ### Pre-Game Systems?
 
-### counters
-win_counter = 0
-loss_counter = 0
-
-
-
 def play_blackjack(chip_balance, player_name):
     print(f'Welcome to Blackjack, {player_name}!')
 
+    ### counters
+    win_counter = 0
+    loss_counter = 0
 
     # Player betting
     def player_betting():
+        nonlocal chip_balance
         while True:
-            player_bet = input(f'How much would you like to bet {player_name}? Ex(25) ')
+            player_bet = int(input(f'How much would you like to bet {player_name}? Ex(250) '))
             if player_bet > chip_balance:
-                print('You do not have that much.')
+                print("You don't have that much.")
                 continue
             else:
                 chip_balance -= player_bet
+                break
+        return player_bet
     
     # chip distribution calculator
     def show_chips():
@@ -61,7 +61,7 @@ def play_blackjack(chip_balance, player_name):
             deck_of_cards.append(card)
 
     ### Hand Value Calculator
-    def calculate_hand_value(hand):
+    def calculate_hand_value(hand, show_ace_message = False):
         total = 0
         count_ace = 0
         for card in hand:
@@ -73,12 +73,14 @@ def play_blackjack(chip_balance, player_name):
             elif rank == 'A':
                 count_ace += 1
                 total += 11
+        
         while total > 21 and count_ace > 0:
             total -= 10
-            count_ace -= 1        
-            print('Ace is now a 1!')
+            count_ace -= 1
+            if show_ace_message:
+                print('Ace is now a 1!')
+                show_ace_message = False
         return total
-
 
     ### chips get shown here once before the game starts
     show_chips()
@@ -96,13 +98,14 @@ def play_blackjack(chip_balance, player_name):
                 for suit in suits:
                     card = rank + suit
                     deck_of_cards.append(card)
-            print('Deck has been reset and reshuffled!')
+            random.shuffle(deck_of_cards)
+            print('The deck has been reset and reshuffled!')
 
         ### This is a test
-        print(deck_of_cards)
+        # print(deck_of_cards)
 
         ### Player Betting Prompt
-        player_betting()
+        bet = player_betting()
         
         ### Card dealing
         Player = []
@@ -148,8 +151,13 @@ def play_blackjack(chip_balance, player_name):
         #     print('You Lose :(' + ', ' + 'Losses: ' + str(loss_counter))
 
         ### Player Hit, Stand, Double Down Choices
+        turns = 0
+
         while player_total < 21:
-            player_decision = input("Would you like to Hit, Stand or Double Down(DD)? ")
+            if turns == 0:
+                player_decision = input("Would you like to Hit, Stand or Double Down(DD)? ")
+            else:
+                player_decision = input("Would you like to Hit, or Stand? ")
             
         ### Player Hit, Stand, Double Down cont
             if player_decision.lower() == 'hit':
@@ -158,15 +166,22 @@ def play_blackjack(chip_balance, player_name):
                 time.sleep(0.5)
                 print(f"Dealt {card} to {player_name}")
                 player_total = calculate_hand_value(Player)
-                print('Player = ' + str(Player) + ', ' + 'Total = ' + str(player_total))
+                print(f'{player_name} = ' + str(Player) + ', ' + 'Total = ' + str(player_total))
+                turns += 1
+            
             elif player_decision.lower() == 'dd':
-                card = deck_of_cards.pop(0)
-                Player.append(card)
-                time.sleep(0.5)
-                print(f"Dealt {card} to {player_name}")
-                player_total = calculate_hand_value(Player)
-                print('Player = ' + str(Player) + ', ' + 'Total = ' + str(player_total))
-                break
+                if bet <= chip_balance:
+                    chip_balance -= bet
+                    card = deck_of_cards.pop(0)
+                    Player.append(card)
+                    time.sleep(0.5)
+                    print(f"Dealt {card} to {player_name}")
+                    player_total = calculate_hand_value(Player)
+                    print(f'{player_name} = ' + str(Player) + ', ' + 'Total = ' + str(player_total))
+                    break
+                else:
+                    print("You don't have enough chips to Double Down." )
+                    continue
 
             elif player_decision.lower() == 'stand':
                 break
@@ -174,8 +189,11 @@ def play_blackjack(chip_balance, player_name):
         print('Dealer = ' + str(dealer_display) + ', ' + 'Total = ??')
 
         if player_total > 21:
+            print('Dealer = ' + str(Dealer) + ', ' + 'Total = ' + str(dealer_total))
             loss_counter += 1
+            time.sleep(0.5)
             print('You Lose :(' + ', ' + 'Losses: ' + str(loss_counter))
+            show_chips()
 
         ### Player side done now onto dealers turn
         if player_total <= 21:
@@ -191,12 +209,20 @@ def play_blackjack(chip_balance, player_name):
             
             if dealer_total > 21:
                 win_counter += 1
+                if player_decision.lower() == 'dd':
+                        chip_balance += 2 * (bet * 2)
+                else:
+                    chip_balance += bet * 2
                 print('You Win!' + ', ' + 'Wins: ' + str(win_counter))
                 show_chips()
                 ### if dealer stops and player doesn't bust
             else:
                 if player_total > dealer_total:
                     win_counter += 1
+                    if player_decision.lower() == 'dd':
+                        chip_balance += 2 * (bet * 2)
+                    else:
+                        chip_balance += bet * 2
                     print('You Win!' + ', ' + 'Wins: ' + str(win_counter))
                     show_chips()
                 elif player_total < dealer_total:
@@ -204,7 +230,11 @@ def play_blackjack(chip_balance, player_name):
                     print('You Lose :(' + ', ' + 'Losses: ' + str(loss_counter))
                     show_chips()
                 else:
-                    print('It is a push')
+                    print("It's a push")
+                    if player_decision.lower() == 'dd':
+                        chip_balance += bet * 2
+                    else:
+                        chip_balance += bet
                     show_chips()
 
         play_again = input('Do you want to play another hand? (Y/N) ')

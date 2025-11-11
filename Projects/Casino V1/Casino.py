@@ -1,5 +1,8 @@
 import time
 from Black_Jack_Game import blackjack
+import sys
+sys.path.append(r'Projects\Casino V1\Black_Jack_Game')
+import blackjack
 
 
 ### Counter
@@ -222,7 +225,7 @@ while True:
         print('Games:')
         print('1. BlackJack')
         game_selection = int(input('Please type the # of the game. Ex: "1" '))
-        if game_selection == '1':
+        if game_selection == 1:
             #take the player to blackjack. I forgot how to do this.
             chip_balance = blackjack.play_blackjack(chip_balance, player_name)
         # This else clause is temp until I add more games.
