@@ -151,8 +151,24 @@ def play_blackjack(chip_balance, player_name):
         #     print('You Lose :(' + ', ' + 'Losses: ' + str(loss_counter))
 
         ### Player Hit, Stand, Double Down Choices
+        if player_total == 21:
+            print('Dealer = ' + str(Dealer) + ', ' + 'Total = ' + str(dealer_total))
+            if dealer_total == 21:
+                print("Both have Blackjack! It's a push")
+                chip_balance += bet
+            else:
+                print('Blackjack! You Win!')
+                win_counter += 1
+                chip_balance += int(bet * 2.5)  # Blackjack traditionally pays 3:2
+            show_chips()
+            play_again = input('Do you want to play another hand? (Y/N) ')
+            if play_again.lower() != 'y':
+                print('Thanks for playing!')
+                return chip_balance
+            continue
+        
         turns = 0
-
+        
         while player_total < 21:
             if turns == 0:
                 player_decision = input("Would you like to Hit, Stand or Double Down(DD)? ")
