@@ -6,9 +6,6 @@ import matplotlib.pyplot as plot
 
 def run_simulation(starting_bankroll, num_hands, use_card_counting = True):
 
-    bet_wins = {'10': 0, '20': 0, '30': 0, '40': 0}
-    bet_losses = {'10': 0, '20': 0, '30': 0, '40': 0}
-
     chip_balance = starting_bankroll
 
     ### counters
@@ -255,6 +252,7 @@ def run_simulation(starting_bankroll, num_hands, use_card_counting = True):
         'roi': ((chip_balance - starting_bankroll)/starting_bankroll)*100,
         'bankroll_history': bankroll_history}
 
+### 1 10k hand run per strat to vizualize and compare the outcomes per hand and overall at the end
 def visualize_comparison(starting_bankroll, num_hands):
     ### Runnings Sims
     print("\nRunning Card Counting Simulation")
@@ -278,7 +276,6 @@ def visualize_comparison(starting_bankroll, num_hands):
     print(f"Bankroll Difference: {counting_results['final_bankroll'] - flat_results['final_bankroll']}")
     
     overall_roi = round(counting_results['roi'] - flat_results['roi'], 2)
-    
     print(f"ROI Difference: {overall_roi}%")
     
     ### Plotting
@@ -301,5 +298,135 @@ def visualize_comparison(starting_bankroll, num_hands):
     
     print("\nGraph saved as 'blackjack_comparison.png'")
 
+### Monte Carlo Analysis based on 100 10k hand runs for card counting and flat bets and compared to see which is the best overall
+def monte_carlo_analysis(starting_bankroll, num_hands, num_simulations):
+    """
+    Run Monte Carlo simulation comparing card counting vs flat betting.
+    
+    Arguments:
+        starting_bankroll: Initial money to start with
+        num_hands: Number of hands per simulation
+        num_simulations: Number of times to run the simulation
+    
+    Returns:
+        Avg Final Data Summary and Histograms(Side by Side & Overlapping)
+    """
+
+
+    ### Counting Finals after 100 Runs
+    counting_final_bankrolls = []
+    counting_final_profit_loss = []
+    counting_final_win_rate = []
+    
+    ### Flat Finals after 100 Runs
+    flat_final_bankrolls = []
+    flat_final_profit_loss = []
+    flat_final_win_rate = []
+    
+    ### Running 100 Times
+    for i in range(num_simulations):
+        print(f'Simulation {i+1}/{num_simulations}')
+        print("\nRunning Card Counting Simulation")
+        counting_results = run_simulation(starting_bankroll, num_hands, use_card_counting=True)
+        counting_final_bankrolls.append(counting_results['final_bankroll'])
+        counting_final_profit_loss.append(counting_results['profit_loss'])
+        counting_final_win_rate.append(counting_results['win_rate'])
+                
+        print("\nRunning Flat Betting Simulation")
+        flat_results = run_simulation(starting_bankroll, num_hands, use_card_counting=False)
+        flat_final_bankrolls.append(flat_results['final_bankroll'])
+        flat_final_profit_loss.append(flat_results['profit_loss'])
+        flat_final_win_rate.append(flat_results['win_rate'])
+    
+    ### Avg from 100 Runs for Counting
+    avg_counting_bankroll = sum(counting_final_bankrolls)/num_simulations
+    avg_counting_profit_loss = sum(counting_final_profit_loss)/num_simulations
+    avg_counting_win_rate = sum(counting_final_win_rate)/num_simulations
+
+    ### Avg from 100 Runs for Flat
+    avg_flat_bankroll = sum(flat_final_bankrolls)/num_simulations
+    avg_flat_profit_loss = sum(flat_final_profit_loss)/num_simulations
+    avg_flat_win_rate = sum(flat_final_win_rate)/num_simulations
+
+
+    counting_wins = 0
+    for i in range(num_simulations):
+        if counting_final_bankrolls[i] > flat_final_bankrolls[i]:
+            counting_wins += 1
+
+    ### Printing Results
+    print("\nMONTE CARLO SUMMARY")
+
+    print("\nSummary of Card Counting Results")
+    print(f"Avg Final Bankroll: {avg_counting_bankroll}")
+    print(f"Avg Profit/Loss: {avg_counting_profit_loss}")
+    print(f"Avg Win Rate: {avg_counting_win_rate}")
+
+    print("\nSummary of Flat Bet Results")
+    print(f"Avg Final Bankroll: {avg_flat_bankroll}")
+    print(f"Avg Profit/Loss: {avg_flat_profit_loss}")
+    print(f"Avg Win Rate: {avg_flat_win_rate}")
+
+    print("\nComparison:")
+    print(f"Card Counting won {counting_wins} out of {num_simulations} simulations ({counting_wins/num_simulations*100:.1f}%)")
+    print(f"Average bankroll difference: ${avg_counting_bankroll - avg_flat_bankroll:,.2f}")   
+
+    ### Plotting Histogram Overlapping
+    plot.figure(figsize = (12, 6))
+    
+    all_data = counting_final_bankrolls + flat_final_bankrolls
+    bins = plot.hist(all_data, bins=30, alpha=0)[1]
+
+    plot.hist(counting_final_bankrolls, bins = bins, alpha = 0.6, label = 'Card Counting', color = 'blue', edgecolor = 'black', rwidth = 1.0)
+    plot.hist(flat_final_bankrolls, bins = bins, alpha = 0.6, label = 'Flat Betting', color = 'orange', edgecolor = 'black', rwidth = 1.0)
+
+    plot.axvline(x = starting_bankroll, color = 'black', linestyle = '--', linewidth = 2, label = 'Starting Bankroll')
+
+    plot.xlabel('Final Bankroll ($)')
+    plot.ylabel('Frequency (Number of Simulations)')
+    plot.title(f'Monte Carlo Analysis Histogram ({num_simulations}) Simulations')
+    plot.legend()
+    plot.grid(True, alpha = 0.3, axis = 'y')
+
+    plot.savefig('monte_carlo_histogram_overlapping.png', dpi = 500, bbox_inches = 'tight')
+    plot.show()
+
+    ### Plotting Histogram Side by Side
+    fig, (ax1, ax2) = plot.subplots(1, 2, figsize=(16, 6))
+
+    # Left plot for Card Counting
+    ax1.hist(counting_final_bankrolls, bins=30, alpha=0.7, color='blue', edgecolor='black')
+    ax1.axvline(x=starting_bankroll, color='black', linestyle='--', linewidth=2, label='Starting Bankroll')
+    ax1.set_xlabel('Final Bankroll ($)')
+    ax1.set_ylabel('Frequency')
+    ax1.set_title('Card Counting Distribution')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3, axis='y')
+
+    # Right plot for Flat Betting
+    ax2.hist(flat_final_bankrolls, bins=30, alpha=0.7, color='orange', edgecolor='black')
+    ax2.axvline(x=starting_bankroll, color='black', linestyle='--', linewidth=2, label='Starting Bankroll')
+    ax2.set_xlabel('Final Bankroll ($)')
+    ax2.set_ylabel('Frequency')
+    ax2.set_title('Flat Betting Distribution')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3, axis='y')
+
+    y_max = max(ax1.get_ylim()[1], ax2.get_ylim()[1])
+    x_min = min(ax1.get_xlim()[0], ax2.get_xlim()[0])
+    x_max = max(ax1.get_xlim()[1], ax2.get_xlim()[1])
+
+    ax1.set_ylim(0, y_max)
+    ax2.set_ylim(0, y_max)
+    ax1.set_xlim(x_min, x_max)
+    ax2.set_xlim(x_min, x_max)
+    
+    plot.suptitle(f'Monte Carlo Analysis - {num_simulations} Simulations Per Strategy', fontsize=14)
+    plot.tight_layout()
+
+    plot.savefig('monte_carlo_histogram_side_by_side.png', dpi=500, bbox_inches='tight')
+    plot.show()
+
 if __name__ == "__main__":
-    visualize_comparison(10000, 10000) #(starting_bankroll, num_hands)
+    # visualize_comparison(10000, 10000) #(starting_bankroll, num_hands)
+    monte_carlo_analysis(10000,10000,100) #(starting_bankroll, num_hands, num_simulations)
