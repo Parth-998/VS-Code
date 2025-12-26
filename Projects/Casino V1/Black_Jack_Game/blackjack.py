@@ -10,6 +10,7 @@ def play_blackjack(chip_balance, player_name):
     ### counters
     win_counter = 0
     loss_counter = 0
+    running_count = 0
 
     # Player betting
     def player_betting():
@@ -47,6 +48,19 @@ def play_blackjack(chip_balance, player_name):
         print(f'Green Chips($25): {green_chips}')
         print(f'Red Chips($5): {red_chips}')
         print(f'White Chips($1): {white_chips}')
+
+    # Card Counting Calculator
+    def card_counting(card):
+        nonlocal running_count
+        rank = card[:-1]
+        if rank in ['2', '3', '4', '5', '6']:
+            running_count += 1
+        elif rank in ['7', '8', '9']:
+            running_count += 0
+        elif rank in ['10', 'J', 'Q', 'K', 'A']:
+            running_count -= 1
+        decks_remaining = len(deck_of_cards)/52
+        true_count = running_count/decks_remaining
 
     ### Main Game Logic
 
@@ -99,6 +113,7 @@ def play_blackjack(chip_balance, player_name):
                     card = rank + suit
                     deck_of_cards.append(card)
             random.shuffle(deck_of_cards)
+            running_count = 0
             print('The deck has been reset and reshuffled!')
 
         ### This is a test
@@ -114,18 +129,21 @@ def play_blackjack(chip_balance, player_name):
         for i in deck_of_cards:
             if len(Player) <= 1:
                 card = deck_of_cards.pop(0)
+                card_counting(card)
                 Player.append(card)
                 print(f"Dealt {card} to {player_name}")
                 time.sleep(0.5)
             
             if len(Dealer) == 0:
                 card = deck_of_cards.pop(0)
+                card_counting(card)
                 Dealer.append(card)
                 print(f"Dealt {card} to Dealer")
                 time.sleep(0.5)
 
             elif len(Dealer) == 1:
                 card = deck_of_cards.pop(0)
+                card_counting(card)
                 Dealer.append(card)
                 print("Dealt ?? to Dealer")
                 time.sleep(0.5)
@@ -178,6 +196,7 @@ def play_blackjack(chip_balance, player_name):
         ### Player Hit, Stand, Double Down cont
             if player_decision.lower() == 'hit':
                 card = deck_of_cards.pop(0)
+                card_counting(card)
                 Player.append(card)
                 time.sleep(0.5)
                 print(f"Dealt {card} to {player_name}")
@@ -189,6 +208,7 @@ def play_blackjack(chip_balance, player_name):
                 if bet <= chip_balance:
                     chip_balance -= bet
                     card = deck_of_cards.pop(0)
+                    card_counting(card)
                     Player.append(card)
                     time.sleep(0.5)
                     print(f"Dealt {card} to {player_name}")
@@ -217,6 +237,7 @@ def play_blackjack(chip_balance, player_name):
 
             while dealer_total < 17:
                 card = deck_of_cards.pop(0)
+                card_counting(card)
                 Dealer.append(card)
                 print(f"Dealt {card} to Dealer")
                 time.sleep(0.5)
