@@ -48,7 +48,15 @@ Even with card counting, bankroll variance is significant. The results ranged fr
 - Neutral cards (7-9): 0  
 - High cards (10-A): -1
 - True Count = Running Count ÷ Decks Remaining
-- Bet spread: 1-4 units based on true count
+
+**Dynamic Bet Sizing**:
+The bet size is recalculated before each hand based on the current true count:
+- True Count ≤ 1: $10 bet
+- True Count = 2: $20 bet
+- True Count = 3: $30 bet
+- True Count ≥ 4: $40 bet
+
+As cards are dealt and the count changes, the next hand's bet adjusts accordingly. This allows the player to bet more when the deck is favorable (high count) and less when it's unfavorable (low count).
 
 **Basic Strategy**:
 - Always hit on 11 or below
